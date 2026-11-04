@@ -8,7 +8,7 @@ Intended status: Informational                           4 November 2026
 Expires: 8 May 2027
 
 
-                           TODO - Your title
+          A Discovery Mechanism for DNS Transparency Services
                   draft-todo-yourname-protocol-latest
 
 Abstract
