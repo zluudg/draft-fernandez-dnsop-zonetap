@@ -72,87 +72,127 @@ The RR Type code for the ZONETAP RR is TBD.
 
 ## The ZONETAP RDATA Format
 
-The RDATA of the ZONETAP presentation format consists of three text
-fields indicating what transport to use, the endpoint for the zone
-transparency service and a what model is used for the data.
+The RDATA of the ZONETAP presentation format consists of two text
+that guides the discoverer to where it can find a zone transparency
+service and what kind of content it can expect.
 
 TODO some ASCII art showing the wire encoding.
 
 
-### The TRANSPORT Field
+### The SERVICE-ID Field
 
-The TRANSPORT field indicates how to fetch the zone data. This draft
-defines the following values:
+The SERVICE-ID field consists of a URI (TODO-ref) that tells the discoverer
+where and how to fetch the zone data. This draft supports the following
+schemes:
 
-| Value | MNEMONIC | Description |
-|-------|----------|-------------|
-| 0     | NONE     | No zone transparency service available |
-| 1     | XFR      | Zone transparency service available via an open zone transfer TODO-ref |
-| 2     | HTTP     | Zone transparency service available via HTTP TODO-ref |
+| Scheme | Description |
+|--------|-------------|
+| dns    | Zone transparency service available via an open zone transfer {{!RFC4501}} |
+| http  | Zone transparency service available via HTTPS TODO-ref |
+| https  | Zone transparency service available via HTTPS TODO-ref |
 
-### The ENDPOINT Field
+For SERVICE-ID field URIs with a "dns" scheme, the "dnstypeval" parameter
+SHOULD have a value of AXFR or IXFR (or their corresponding numerical
+values) to indicate that the zone is available via an open zone
+transfer at the given "dnsauthority". Standard ports are assumed if not
+explicitly part of the "dnsauthority". I.e. tcp port 853. The
+"dnsclassval" SHOULD be "IN", the Internet class, or omitted, which is
+equivalent.
 
-The ENDPOINT field shows where to connect to. For a record with an XFR
-TRANSPORT field, the ENDPOINT field SHOULD be a DNS name (TODO-ref).
-If it is not a valid DNS name, the discoverer MAY try to use it anyway, for
-example by extracting the hostname part if the ENDPOINT value happens
-to be a URL (TODO-ref).
+For SERVICE-ID field URIs with a "http" or "https" scheme, field SHOULD
+contain a URL from where the zone data can be fetched.
 
-For a record with a HTTP TRANSPORT field the value SHOULD be a URL
-(TODO-ref). If it is not a valud URL, perhaps it is a plain IP address,
-a discoverer MAY try to use that instead.
+Furthermore, the SERVICE-ID field can be set to a period (hex value 0x2E),
+to explicitly state that there is no zone transparency service available
+for the zone in question.
 
-For a record with a TRANSPORT field set to NONE, the ENDPOINT value MUST
-be set to a null byte.
 
-### The MODEL Field
+### The FORMAT Field
 
-The MODEL field shows how the DNS transparency information that is being
-shared is represented. For records with an XFR TRANSPORT field, the
+The FORMAT field shows how the DNS transparency information that is being
+shared is represented and its allowed values vary depending on the
+scheme in the SERVICE-ID field. For records with a "dns" scheme, the
 model field MUST have one of the following values:
 
 | Value | MNEMONIC | Description |
 |-------|----------|-------------|
-| 0     | AXFR     | Only full zone transfers are available |
-| 1     | IXFR     | Incremental zone transfers are available (TODO-ref) |
+| 1     | SIGNED   | A signed version of the zone is provided  |
+| 2     | UNSIGNED | An unsigned version of the zone is provided |
 
-For records with a TRANSPORT field set to HTTP, the MODEL field SHOULD
+For records with a "http" or "https" field, the FORMAT field SHOULD
 be a valid MIME type (TODO-ref). For example, it could be set to
 "text/plain" for a transparency service that publishes zone data as
 a text file. A discoverer MAY try to interpret values that are not valid MIME
 types. For example, if the value is a URL that points to a JSON schema (TODO-ref),
 the discoverer can try to use that as its data model.
 
-For a record with a TRANSPORT field set to NONE, the MODEL value MUST
-be set to a null byte.
+For a record with a SERVICE-ID field set to a single period to indicate
+the non-existance of a zone transparency service, the FORMAT value can
+be set to anything and discoverers SHOULD ignore it since it adds
+no meaningful information to the fact that there is no zone transparency
+service.
 
 
 ## The ZONETAP Presentation Format
 
-For a service that provides updates
+For a service that exposes the signed zone data and supports incremental
+zone transfers, the record would look like:
 
 ```
-example.    86400   IN  ZONETAP     XFR     zonetap.example.    IXFR
+example.    86400   IN  ZONETAP     dns:zonetap.example.?TYPE=IXFR     SIGNED
+```
+
+For a service that exposes an unsigned version of the zone on a
+non-standard portand only supports AXFR, the record would be:
+
+```
+example.    86400   IN  ZONETAP     dns:zonetap2.example.:20000?TYPE=AXFR     UNSIGNED
+```
+
+A service that consists of publishing a text file with a list of the
+zone contents (i.e. a zone file as it often appears on disk), the
+record would be:
+
+```
+example.    86400   IN  ZONETAP     https://zonetap3.example/example.zone     text/plain
+```
+
+A service that encodes the zone content and enriches it with, for instance,
+WHOIS data according to a specific data model would look like:
+
+```
+example.    86400   IN  ZONETAP     https://zonetap4.example/example.json     https://schemas.example/zone-transparency.json
 ```
 
 
 # Security Considerations {#security}
 
 A zone transparency service SHOULD try to provide the data in an
-authenticated manner. For services using the HTTP TRANSPORT, relying
-on WebPKI (TODO-ref) is most likely sufficient. Services using XFR, can
-signal the existence of XoT (TODO-ref) using an SVCB record similar to
-{{!RFC9462}} and a correponding TLSA record {{!RFC6698}}:
+authenticated manner. For services using the "https" scheme, relying
+on WebPKI (TODO-ref) is most likely sufficient. Services using the "dns"
+scheme, can publish a TLSA TLSA record {{!RFC6698}}. For instance, the
+service:
 
 ```
-_dns.zonetap.example.       IN  SVCB 1 zonetap.example. alpn=dot port=8530
-_8530._tcp.zonetap.example. IN  TLSA 3 0 0 30820307308201efa003020102020...
+example.    86400   IN  ZONETAP     dns:zonetap5.example.?TYPE=AXFR     UNSIGNED
+```
+
+Would publish the following TLSA record:
+
+```
+_853._tcp.zonetap.example. IN  TLSA 3 0 0 30820307308201efa003020102020...
 ```
 
 
 # IANA Considerations {#iana}
 
-This document has no IANA actions.
+IANA is requested to update the "Resource Record (RR) TYPEs" registry
+under the "Domain Name System (DNS) Parameters" registry group as follows:
+
+Type: ZONETAP
+Value: TBD
+Meaning: Zone Transparency Service Discovery
+Reference: (this document)
 
 
 # TODO (unfinished thoughts)
@@ -162,6 +202,8 @@ the zone data or "zone file"?
 
 Add another RDATA field that indicates some kind of periodicity with
 which the data is updated?
+
+Worth having a "mailto" scheme?
 
 
 --- back
