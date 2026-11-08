@@ -42,7 +42,21 @@ TODO Abstract
 
 # Introduction {#intro}
 
-TODO Introduction
+The Central Zone Data Service (CZDS, TODO-ref) provides data that is
+fundamental to understanding how malicious actors operate on the Internet.
+However, it has a few drawbacks. Recent research shows that the frequency
+with which the CZDS is updated is too low, which allows some attackers to
+evade detection (TODO-ref). Furthermore, while CZDS is mandatory for generic
+top-level domains (gTLD) to partake in, many country-code top-level
+domains (ccTLD) lack a similar service. Lastly, the CZDS gives no
+insight in how data changes within zones at the level where domains are
+usually registered. For example, it enables researchers to see changes
+within the .com zone (or its siblings), but not within its child zones
+(i.e. example.com and its siblings).
+
+This document proposes a mechanism that lets individual zones promote
+an alternative zone transparency service that may go beyond what the
+CZDS requires.
 
 
 # Conventions and Definitions
@@ -59,6 +73,15 @@ Discoverer: Someone trying to discover a zone transparency service. This
     investigation or troubleshooting a network issue or an automatic
     program that is looking for a connection point.
 
+
+# Zone Transparency Discovery
+
+A discoverer issues a query for example.com and sets the query type to
+ZONETAP. Via the response, the discoverer discovers an service from
+which it can download the zone contents as they look at that precise
+moment. It can use that data to, for instance, look for A records that
+contain IP addresses that are known to be part of a botnet as a proactive
+measure.
 
 # The ZONETAP Resource Record
 
@@ -164,6 +187,45 @@ WHOIS data according to a specific data model would look like:
 example.    86400   IN  ZONETAP     https://zonetap4.example/example.json     https://schemas.example/zone-transparency.json
 ```
 
+# For Zone Owners
+
+Zone owners may wish to provide a zone transparency service for their
+zone for a number of different reasons. For instance, it may offload
+authoritative nameservers that are subject to zone walking, subdomain
+enumeration via dictionary attacks or similar. It can also improve the
+reputation of a zone by showing that it is not involved in malicious
+activities such as fast-flux (TODO-ref) or, if the zone is an effective
+TLD, domain-flux (TODO-ref).
+
+
+# For DNS Providers
+
+DNS providers, either dedicated ones or registrars who offer DNS services
+to their registrants, could let their customers, i.e. the zone owners,
+opt-in to a dedicated transparency service. If the zone owner opts in,
+the provider can add the ZONETAP record to the zone and set up the
+underlying infrastructure without the zone owner having to be aware of
+any of the implementation details. Opting in could be as simple as
+ticking a checkbox in a web GUI.
+
+
+# For Registries
+
+Registries, typically operators of TLD zones, can of course also offer
+a transparency service. While a lot of malicious activity happens at
+a level or two below the TLD level, fine-grained data from TLDs is still
+valuable. It will, for instance, make it easier for security researchers
+to detect newly registered domains or large batch registrations, both of
+which are associated with malicious activity. It would also help provide
+operational insights for the wider Internet community. For example, to
+what extent best practices are followed when delegation records are being
+updated or when KSK rollovers are performed.
+
+Some ccTLDs already offer zone transparency services comparable to the
+CZDS (for example, .se, .nu, .ee and .ch) but with no standardized way
+of discovering them, they are at risk of being overlooked by security
+researchers.
+
 
 # Security Considerations {#security}
 
@@ -182,6 +244,16 @@ Would publish the following TLSA record:
 ```
 _853._tcp.zonetap.example. IN  TLSA 3 0 0 30820307308201efa003020102020...
 ```
+
+Of course, even with authenticated access to a zone transparency service,
+it can still "lie" about the zone contents. For example, it can omit
+A records with low-reputation IP addresses. A ZONETAP record on its own
+is not enough to guarantee that a zone is not involved in malicious
+activities. But over time, if the transparency service does not disagree
+with what is observed by other actors on the Internet, such as resolver
+operators, then the service will eventually become trusted. That way,
+DNS providers can distinguish themselves by having a reliable
+transparency service (that its customers can opt-in to).
 
 
 # IANA Considerations {#iana}
