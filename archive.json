@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-05T04:43:28.187295+00:00",
+  "timestamp": "2026-11-08T03:53:49.209552+00:00",
   "repo": "zluudg/draft-fernandez-dnsop-zonetap",
   "labels": [
     {
@@ -55,5 +55,34 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOViuaQM8AAAABNMAf_A",
+      "title": "Dev",
+      "url": "https://github.com/zluudg/draft-fernandez-dnsop-zonetap/pull/1",
+      "state": "MERGED",
+      "author": "zluudg",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-11-05T22:56:39Z",
+      "updatedAt": "2026-11-05T22:58:16Z",
+      "baseRepository": "zluudg/draft-fernandez-dnsop-zonetap",
+      "baseRefName": "main",
+      "baseRefOid": "7e921eef11c9c0993258e4a9c35fa5fbfa795221",
+      "headRepository": "zluudg/draft-fernandez-dnsop-zonetap",
+      "headRefName": "dev",
+      "headRefOid": "b5febf8205cc760c6ea7fbf341a381bafacb38ce",
+      "closedAt": "2026-11-05T22:58:16Z",
+      "mergedAt": "2026-11-05T22:58:16Z",
+      "mergedBy": "zluudg",
+      "mergeCommit": {
+        "oid": "525ad214196c9b2a70131ea9083f4a7fa5d847f7"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
