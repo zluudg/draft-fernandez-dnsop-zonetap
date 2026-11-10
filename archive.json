@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-08T03:53:49.209552+00:00",
+  "timestamp": "2026-11-10T05:38:53.226933+00:00",
   "repo": "zluudg/draft-fernandez-dnsop-zonetap",
   "labels": [
     {
@@ -80,6 +80,34 @@
       "mergedBy": "zluudg",
       "mergeCommit": {
         "oid": "525ad214196c9b2a70131ea9083f4a7fa5d847f7"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOViuaQM8AAAABNua0_A",
+      "title": "Added some thoughts on how this could benefit providers, registries a\u2026",
+      "url": "https://github.com/zluudg/draft-fernandez-dnsop-zonetap/pull/2",
+      "state": "MERGED",
+      "author": "zluudg",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "\u2026nd registrants",
+      "createdAt": "2026-11-08T23:05:58Z",
+      "updatedAt": "2026-11-08T23:13:29Z",
+      "baseRepository": "zluudg/draft-fernandez-dnsop-zonetap",
+      "baseRefName": "main",
+      "baseRefOid": "525ad214196c9b2a70131ea9083f4a7fa5d847f7",
+      "headRepository": "zluudg/draft-fernandez-dnsop-zonetap",
+      "headRefName": "dev",
+      "headRefOid": "6e15009f75949beea9156665a71bd87e4542ff20",
+      "closedAt": "2026-11-08T23:13:29Z",
+      "mergedAt": "2026-11-08T23:13:29Z",
+      "mergedBy": "zluudg",
+      "mergeCommit": {
+        "oid": "39124e6a2fb2c34358bb4717952b555dfae63a33"
       },
       "comments": [],
       "reviews": []
